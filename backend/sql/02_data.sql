@@ -1,0 +1,47 @@
+-- ============================================
+-- CALCIO SQL - Dati iniziali
+-- ============================================
+
+-- Inserimento giocatori di esempio
+INSERT INTO giocatori (nome_completo, ruolo, valore) VALUES
+    ('Cristiano Ronaldo', 'Attaccante', 25.00),
+    ('Lionel Messi', 'Attaccante', 30.00),
+    ('Kevin De Bruyne', 'Centrocampista', 20.00),
+    ('Virgil van Dijk', 'Difensore', 18.00),
+    ('Alisson Becker', 'Portiere', 15.00),
+    ('Robert Lewandowski', 'Attaccante', 22.00),
+    ('Luka Modrić', 'Centrocampista', 16.00),
+    ('Sergio Ramos', 'Difensore', 14.00),
+    ('Marc-André ter Stegen', 'Portiere', 12.00),
+    ('Kylian Mbappé', 'Attaccante', 35.00),
+    ('Erling Haaland', 'Attaccante', 28.00),
+    ('Jude Bellingham', 'Centrocampista', 19.00),
+    ('Antonio Rüdiger', 'Difensore', 13.00),
+    ('Manuel Neuer', 'Portiere', 11.00),
+    ('Karim Benzema', 'Attaccante', 21.00),
+    ('Toni Kroos', 'Centrocampista', 15.00),
+    ('Raphaël Varane', 'Difensore', 12.00),
+    ('Jan Oblak', 'Portiere', 10.00),
+    ('Neymar', 'Attaccante', 24.00),
+    ('Mohamed Salah', 'Attaccante', 23.00),
+    ('Frenkie de Jong', 'Centrocampista', 17.00),
+    ('Aymeric Laporte', 'Difensore', 11.00),
+    ('Ederson', 'Portiere', 9.00),
+    ('Phil Foden', 'Centrocampista', 18.00),
+    ('Rúben Dias', 'Difensore', 10.00),
+    ('Bruno Fernandes', 'Centrocampista', 19.00),
+    ('Harry Kane', 'Attaccante', 26.00),
+    ('Thibaut Courtois', 'Portiere', 13.00),
+    ('Federico Chiesa', 'Attaccante', 17.00),
+    ('Gianluigi Donnarumma', 'Portiere', 14.00),
+    ('Pedri', 'Centrocampista', 16.00),
+    ('Marquinhos', 'Difensore', 15.00),
+    ('João Cancelo', 'Difensore', 14.00),
+    ('Bernardo Silva', 'Centrocampista', 18.00),
+    ('Vinícius Júnior', 'Attaccante', 27.00),
+    ('Joshua Kimmich', 'Centrocampista', 17.00),
+    ('Rodri', 'Centrocampista', 16.00),
+    ('Heung-Min Son', 'Attaccante', 22.00),
+    ('Declan Rice', 'Centrocampista', 15.00),
+    ('Bukayo Saka', 'Attaccante', 20.00)
+ON CONFLICT DO NOTHING;

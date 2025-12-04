@@ -1,0 +1,88 @@
+version: '3.8'
+
+# Docker Compose per ambiente di SVILUPPO
+# Usa: docker-compose -f docker-compose.dev.yml up
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: calciosql-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: calcio_sql
+      POSTGRES_USER: calcio_user
+      POSTGRES_PASSWORD: calcio_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+      - ./backend/sql:/docker-entrypoint-initdb.d
+    networks:
+      - calciosql-network-dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U calcio_user -d calcio_sql"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API (Development mode with hot reload)
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    container_name: calciosql-backend-dev
+    restart: unless-stopped
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=calcio_sql
+      - DB_USER=calcio_user
+      - DB_PASSWORD=calcio_pass
+      - PORT=3000
+      - NODE_ENV=development
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4}
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - calciosql-network-dev
+    volumes:
+      # Mount source code per hot reload
+      - ./backend/src:/app/src
+      - ./frontend:/app/frontend
+      # Escludi node_modules
+      - /app/node_modules
+    command: npm run dev
+
+  # pgAdmin (optional - for database management)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: calciosql-pgadmin-dev
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@calciosql.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - calciosql-network-dev
+    volumes:
+      - pgadmin_data_dev:/var/lib/pgadmin
+
+volumes:
+  postgres_data_dev:
+    name: calciosql_postgres_data_dev
+  pgadmin_data_dev:
+    name: calciosql_pgadmin_data_dev
+
+networks:
+  calciosql-network-dev:
+    name: calciosql-network-dev
+    driver: bridge

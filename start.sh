@@ -1,0 +1,27 @@
+#!/bin/bash
+
+echo "╔════════════════════════════════════════════════════════╗"
+echo "║            CALCIO SQL - Avvio Applicazione            ║"
+echo "╚════════════════════════════════════════════════════════╝"
+echo ""
+echo "🚀 Avvio container Docker..."
+echo ""
+
+docker-compose up -d
+
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "✅ Applicazione avviata con successo!"
+    echo ""
+    echo "📱 Apri il browser su: http://localhost:3000"
+    echo ""
+    echo "📊 Per vedere i log: docker-compose logs -f"
+    echo "🛑 Per fermare: docker-compose down"
+    echo ""
+else
+    echo ""
+    echo "❌ Errore durante l'avvio!"
+    echo ""
+    echo "Verifica che Docker sia installato e avviato."
+    echo ""
+fi

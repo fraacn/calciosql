@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: calciosql-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: calcio_sql
+      POSTGRES_USER: calcio_user
+      POSTGRES_PASSWORD: calcio_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/sql:/docker-entrypoint-initdb.d
+    networks:
+      - calciosql-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U calcio_user -d calcio_sql"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    container_name: calciosql-backend
+    restart: unless-stopped
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=calcio_sql
+      - DB_USER=calcio_user
+      - DB_PASSWORD=calcio_pass
+      - PORT=3000
+      - NODE_ENV=production
+      # Optional: OpenAI API Key for match simulation
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4}
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - calciosql-network
+    volumes:
+      - ./frontend:/app/frontend:ro
+
+volumes:
+  postgres_data:
+    name: calciosql_postgres_data
+
+networks:
+  calciosql-network:
+    name: calciosql-network
+    driver: bridge

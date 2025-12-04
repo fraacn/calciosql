@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Calcio SQL – Esercizi INSERT / DELETE / UPDATE</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
+    </style>
+</head>
+<body class="bg-gray-900">
+<div id="root"></div>
+
+<script type="text/babel">
+    const {useState, useEffect, useRef} = React;
+    const API = '/api/calcio';
+
+    function App(){
+        const [email, setEmail] = useState('');
+        const [teamName, setTeamName] = useState('');
+        const [team, setTeam] = useState(null);     // { id, email_presidente, nome_squadra, budget }
+        const [rosa, setRosa] = useState([]);       // [{ id, nome_completo, ruolo, valore, ingaggiato }]
+        const [loading, setLoading] = useState(false);
+        const [error, setError] = useState('');
+        const [cmd, setCmd] = useState('');
+        const [consoleLines, setConsoleLines] = useState([]);
+        const [hist, setHist] = useState([]);
+        const [histIdx, setHistIdx] = useState(-1);
+        const inputRef = useRef(null);
+        const outRef = useRef(null);
+
+        const MAX_GIOCATORI = 11;
+        const BUDGET_MAX = 150.00;
+
+        const [partite, setPartite] = useState([]);
+        const [selectedMatch, setSelectedMatch] = useState(null);
+        const [matchTimeline, setMatchTimeline] = useState([]);
+        const [animatingTimeline, setAnimatingTimeline] = useState(false);
+        const [currentActionIndex, setCurrentActionIndex] = useState(0);
+        const [pendingResult, setPendingResult] = useState(null);
+
+        const addLine = (text, type='info') => {
+            setConsoleLines(prev => [...prev, {text, type, ts: Date.now()}]);
+        };
+        const clearConsole = () => setConsoleLines([]);
+
+        const scrollToBottom = () => {
+            if(outRef.current){
+                outRef.current.scrollTop = outRef.current.scrollHeight;
+            }
+        };
+        useEffect(scrollToBottom, [consoleLines]);
+        useEffect(() => {
+            if (team) {
+                fetchPartite(team.email_presidente);
+                const interval = setInterval(() => {
+                    fetchPartite(team.email_presidente);
+                }, 10000); // Aggiorna ogni 10 secondi
+                return () => clearInterval(interval);
+            }
+        }, [team]);
+        const fmt = (n) => Number(n).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+        const fetchRosa = async (emailPres) => {
+            const res = await fetch(`${API}/rosa/${encodeURIComponent(emailPres)}`);
+            const data = await res.json();
+            if(!res.ok) throw new Error(data.error || 'Errore caricamento rosa');
+            setRosa(data);
+        };
+
+        const initTeam = async (e) => {
+            e.preventDefault();
+            setError('');
+            setLoading(true);
+            try {
+                const payload = { email: email.trim() };
+                if(!team) {
+                    // alla prima volta, se non esiste richiede anche nome
+                    if(teamName.trim()) payload.nome = teamName.trim();
+                }
+                const res = await fetch(`${API}/init`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error || 'Errore inizializzazione squadra');
+
+                setTeam(data);
+                await fetchRosa(data.email_presidente);
+
+                clearConsole();
+                addLine('Benvenuto/a in Calcio SQL ⚽', 'success');
+                addLine(`Squadra: ${data.nome_squadra} (ID: ${data.id})`, 'success');
+                addLine('Scrivi "help" per i comandi disponibili.', 'hint');
+
+                setTimeout(()=> inputRef.current?.focus(), 100);
+            } catch(err){
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        const countGiocatori = rosa.length;
+        const totaleIngaggi = rosa.reduce((s,g)=> s + Number(g.valore||0), 0);
+        const budgetResiduo = Math.max(0, BUDGET_MAX - totaleIngaggi);
+
+        // Helpers di validazione DML
+        const hasWhere = (sql) => /\bwhere\b/i.test(sql);
+        const includesTeamId = (sql, teamId) => new RegExp(`\\b${teamId}\\b`).test(sql);
+        const isDML = (sql) => /^(insert|delete|update|select)\b/i.test(sql.trim());
+
+        const postQuery = async (sql) => {
+            const res = await fetch(`${API}/query`, {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ email: team.email_presidente, query: sql })
+            });
+            const data = await res.json();
+            if(!res.ok) throw new Error(data.error || 'Errore esecuzione query');
+            return data;
+        };
+
+        const onEnter = async () => {
+            const raw = cmd.trim();
+            if(!raw) return;
+            addLine(`$ ${raw}`, 'command');
+            setHist(prev => [...prev, raw]);
+            setHistIdx(-1);
+            setCmd('');
+
+            try{
+                const lower = raw.toLowerCase();
+
+                // === COMANDI LOCALI ===
+                if(lower === 'help'){
+                    addLine('=== COMANDI ===', 'success');
+                    addLine('help                             • mostra questo aiuto', 'hint');
+                    addLine('team                             • info squadra', 'hint');
+                    addLine('roster                           • mostra rosa attuale', 'hint');
+                    addLine('budget                           • mostra budget residuo', 'hint');
+                    addLine('clear                            • pulisci terminale', 'hint');
+                    addLine('--- QUERY CONSENTITE ---', 'warning');
+                    addLine('SELECT * FROM giocatori;', 'info');
+                    addLine('INSERT INTO squadra_giocatori (id_squadra, id_giocatore) VALUES (...);', 'info');
+                    addLine('DELETE FROM squadra_giocatori WHERE id_squadra = ... AND id_giocatore = ...;', 'info');
+                    addLine('UPDATE giocatori SET ... WHERE id = ...;', 'info');
+                    return;
+                }
+
+                if(lower === 'clear'){ clearConsole(); return; }
+                if(lower === 'team'){
+                    addLine(`ID squadra: ${team.id}`, 'info');
+                    addLine(`Nome: ${team.nome_squadra}`, 'info');
+                    addLine(`Email presidente: ${team.email_presidente}`, 'info');
+                    addLine(`Budget massimo: € ${fmt(BUDGET_MAX)}`, 'info');
+                    return;
+                }
+                if(lower === 'roster'){
+                    if(rosa.length === 0){ addLine('Nessun giocatore in rosa.', 'warning'); return; }
+                    addLine('=== ROSA ===', 'success');
+                    rosa.forEach((g,i)=>{
+                        addLine(`${String(i+1).padStart(2,'0')}. ${g.nome_completo} — ${g.ruolo} — € ${fmt(g.valore)}`, 'table-row');
+                    });
+                    addLine(`Totale ingaggi: € ${fmt(totaleIngaggi)} — Residuo: € ${fmt(budgetResiduo)} — Giocatori: ${countGiocatori}/${MAX_GIOCATORI}`, 'hint');
+                    return;
+                }
+                if(lower === 'budget'){
+                    addLine(`Giocatori: ${countGiocatori}/${MAX_GIOCATORI}`, 'info');
+                    addLine(`Totale ingaggi: € ${fmt(totaleIngaggi)}`, 'info');
+                    addLine(`Budget residuo: € ${fmt(budgetResiduo)}`, 'info');
+                    return;
+                }
+
+                // === QUERY SQL ===
+                if(!isDML(raw)){
+                    addLine('Solo SELECT / INSERT / DELETE / UPDATE sono permessi in questa lezione.', 'error');
+                    addLine('Scrivi "help" per esempi.', 'hint');
+                    return;
+                }
+
+                const isDelete = /^delete\b/i.test(raw);
+                const isUpdate = /^update\b/i.test(raw);
+                const isInsert = /^insert\b/i.test(raw);
+                const isSelect = /^select\b/i.test(raw);
+
+                if((isDelete || isUpdate) && !hasWhere(raw)){
+                    addLine('❌ DELETE/UPDATE devono avere una clausola WHERE.', 'error');
+                    return;
+                }
+
+                // Controllo ID squadra solo per DML
+                if((isDelete || isInsert) && !includesTeamId(raw, team.id)){
+                    addLine(`❌ La query deve riferirsi alla tua squadra (ID: ${team.id}).`, 'error');
+                    addLine(`Suggerimento: usa ... WHERE id_squadra = ${team.id} ...`, 'hint');
+                    return;
+                }
+
+                if(isInsert && /squadra_giocatori/i.test(raw)){
+                    if(rosa.length >= MAX_GIOCATORI) addLine(`⚠️ Limite rosa raggiunto (${MAX_GIOCATORI}).`, 'warning');
+                    if(budgetResiduo <= 0) addLine('⚠️ Budget esaurito.', 'warning');
+                }
+
+                addLine('⏳ Esecuzione...', 'info');
+                const res = await postQuery(raw);
+
+                // === SE È SELECT, STAMPA RISULTATI ===
+                if(isSelect){
+                    if(!res.rows || res.rows.length === 0){
+                        addLine('Nessun risultato trovato.', 'warning');
+                    } else {
+                        const cols = Object.keys(res.rows[0]);
+                        const header = `| ${cols.join(' | ')} |`;
+                        addLine(header, 'table-header');
+                        addLine('-'.repeat(header.length), 'table-separator');
+                        res.rows.slice(0,50).forEach((r,idx)=>{
+                            const rowStr = `${String(idx+1).padStart(2,'0')} | ${cols.map(c=>String(r[c])).join(' | ')}`;
+                            addLine(rowStr, 'table-row');
+                        });
+                        addLine(`${res.rows.length} record trovati.`, 'hint');
+                    }
+                } else {
+                    // DML feedback
+                    addLine(`✓ Completato. Righe interessate: ${res.rows}`, 'success');
+                    await fetchRosa(team.email_presidente);
+                }
+
+            } catch(err){
+                addLine(`❌ ERRORE: ${err.message}`, 'error');
+            }
+        };
+
+        const onKeyDown = (e) => {
+            if(e.key === 'Enter'){
+                e.preventDefault();
+                onEnter();
+            } else if(e.key === 'ArrowUp'){
+                e.preventDefault();
+                if(hist.length){
+                    const ni = Math.min(histIdx+1, hist.length-1);
+                    setHistIdx(ni);
+                    setCmd(hist[hist.length-1-ni]);
+                }
+            } else if(e.key === 'ArrowDown'){
+                e.preventDefault();
+                if(histIdx > 0){
+                    const ni = histIdx-1;
+                    setHistIdx(ni);
+                    setCmd(hist[hist.length-1-ni]);
+                } else {
+                    setHistIdx(-1);
+                    setCmd('');
+                }
+            }
+        };
+
+
+// Carica le partite
+        const fetchPartite = async (emailPres) => {
+            try {
+                const res = await fetch(`${API}/partite/${encodeURIComponent(emailPres)}`);
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Errore caricamento partite');
+                setPartite(data);
+            } catch (err) {
+                addLine(`❌ ERRORE PARTITE: ${err.message}`, 'error');
+            }
+        };
+
+// Carica timeline di una partita
+        const fetchMatchTimeline = async (idPartita) => {
+            try {
+                const res = await fetch(`${API}/partita/${idPartita}/timeline`);
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Errore caricamento timeline');
+                return data;
+            } catch (err) {
+                addLine(`❌ ERRORE TIMELINE: ${err.message}`, 'error');
+                return [];
+            }
+        };
+
+// Avvia la partita
+        const startMatch = async (idPartita) => {
+            if (!window.confirm('Avviare la simulazione della partita? Questa azione è irreversibile!')) {
+                return;
+            }
+
+            addLine(`⏳ Avvio simulazione partita ${idPartita}...`, 'info');
+            addLine('Questo potrebbe richiedere 10-30 secondi...', 'hint');
+
+            setAnimatingTimeline(true);
+            setCurrentActionIndex(0);
+
+            try {
+                const res = await fetch(`${API}/partita/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id_partita: idPartita,
+                        email: team.email_presidente
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Errore avvio partita');
+
+                // Non mostriamo subito il risultato se stiamo per mostrare la cronaca live
+                setPendingResult({ g1: data.partita.gol_squadra_1, g2: data.partita.gol_squadra_2 });
+                addLine('📺 Guardando la cronaca dal vivo...', 'info');
+
+                // Aggiorna la lista partite
+                await fetchPartite(team.email_presidente);
+
+                // Seleziona questa partita e anima la timeline
+                setSelectedMatch(idPartita);
+                const normalized = (data.azioni || []).map(a => ({
+                    minuto_azione: a.minuto,
+                    tipo_azione: a.tipo,
+                    descrizione_azione: a.descrizione
+                }));
+                setMatchTimeline(normalized);
+                animateTimeline(normalized);
+
+            } catch (err) {
+                addLine(`❌ ERRORE: ${err.message}`, 'error');
+                setAnimatingTimeline(false);
+            }
+        };
+
+// Anima la timeline azione per azione
+        const animateTimeline = (azioni) => {
+            let index = 0;
+
+            const interval = setInterval(() => {
+                if (index >= azioni.length) {
+                    clearInterval(interval);
+                    setAnimatingTimeline(false);
+                    addLine('🏁 Fine cronaca!', 'success');
+                    // Ora che la cronaca è finita, mostriamo il risultato finale se disponibile
+                    setPendingResult(prev => {
+                        if (prev) {
+                            addLine(`✅ Risultato finale: ${prev.g1}-${prev.g2}`,'success');
+                        }
+                        return null;
+                    });
+                    return;
+                }
+
+                setCurrentActionIndex(index);
+                index++;
+            }, 6000); // 6 secondi tra un'azione e l'altra
+        };
+
+// Visualizza una partita già terminata
+        const viewMatch = async (idPartita) => {
+            setSelectedMatch(idPartita);
+            const timeline = await fetchMatchTimeline(idPartita);
+            setMatchTimeline(timeline);
+            setCurrentActionIndex(timeline.length); // Mostra tutto
+            setAnimatingTimeline(false);
+        };
+
+// Formatta data/ora
+        const formatDateTime = (dateStr) => {
+            const d = new Date(dateStr);
+            return d.toLocaleString('it-IT', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        };
+
+// Determina se l'utente può avviare la partita
+        const canStartMatch = (partita) => {
+            return !partita.terminata &&
+                partita.squadra1_pronta &&
+                partita.squadra2_pronta &&
+                (partita.email_presidente_1 === team.email_presidente ||
+                    partita.email_presidente_2 === team.email_presidente);
+        };
+
+        return (
+            <div className="min-h-screen">
+                {/* Header */}
+                <header className="bg-gray-800 border-b-4 border-emerald-500">
+                    <div className="max-w-7xl mx-auto p-4 flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <div className="text-emerald-400 text-3xl">⚽</div>
+                            <div>
+                                <h1 className="text-2xl font-bold text-emerald-400">Calcio SQL</h1>
+                                <p className="text-gray-400 text-sm">Esercizi su INSERT • DELETE • UPDATE</p>
+                            </div>
+                        </div>
+                        {team && (
+                            <div className="flex flex-wrap items-center gap-2 text-sm">
+                                <span className="bg-blue-900/60 text-blue-200 px-3 py-1 rounded">Squadra: <b>{team.nome_squadra}</b> (ID {team.id})</span>
+                                <span className="bg-purple-900/60 text-purple-200 px-3 py-1 rounded mono">Giocatori: {countGiocatori}/{MAX_GIOCATORI}</span>
+                                <span className="bg-amber-900/60 text-amber-200 px-3 py-1 rounded mono">Residuo: € {fmt(budgetResiduo)}</span>
+                            </div>
+                        )}
+                    </div>
+                </header>
+
+                <main className="max-w-7xl mx-auto p-4">
+                    {/* Login / Init */}
+                    {!team && (
+                        <section className="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-6">
+                            <h2 className="text-emerald-400 font-semibold mb-3">Accedi alla lezione</h2>
+                            <form className="grid md:grid-cols-3 gap-3" onSubmit={initTeam}>
+                                <div className="md:col-span-1">
+                                    <label className="block text-gray-300 text-sm mb-1">Email (presidente)</label>
+                                    <input className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-gray-100"
+                                           type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="es. mario@scuola.it"/>
+                                </div>
+                                <div className="md:col-span-1">
+                                    <label className="block text-gray-300 text-sm mb-1">Nome squadra (solo se nuova)</label>
+                                    <input className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-gray-100"
+                                           type="text" value={teamName} onChange={e=>setTeamName(e.target.value)} placeholder="es. Real SQL"/>
+                                </div>
+                                <div className="md:col-span-1 flex items-end">
+                                    <button disabled={loading} className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 px-4 py-2 rounded font-semibold">
+                                        {loading ? 'Verifica...' : 'Entra / Crea squadra'}
+                                    </button>
+                                </div>
+                            </form>
+                            {error && <p className="text-red-400 mt-2">{error}</p>}
+                            <p className="text-gray-400 text-sm mt-3">
+                                Se l'email non ha ancora una squadra, verrà chiesto il nome e la squadra sarà creata con budget di € {fmt(BUDGET_MAX)}.
+                            </p>
+                        </section>
+                    )}
+
+                    {/* Workspace */}
+                    {team && (
+                        <section className="grid lg:grid-cols-2 gap-4">
+                            {/* Colonna sinistra: ROSA */}
+                            <div className="bg-gray-800 border-2 border-emerald-600 rounded-lg overflow-hidden">
+                                <div className="p-3 border-b border-gray-700 flex items-center justify-between">
+                                    <h3 className="text-emerald-400 font-semibold">Rosa</h3>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={()=> fetchRosa(team.email_presidente).catch(err=>addLine(`ERRORE ROSA: ${err.message}`,'error'))}
+                                            className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-sm"
+                                        >Aggiorna</button>
+                                    </div>
+                                </div>
+                                <div className="max-h-[520px] overflow-y-auto divide-y divide-gray-700">
+                                    {rosa.length === 0 && (
+                                        <div className="p-4 text-gray-400">Nessun giocatore in rosa. Usa una <span className="mono text-yellow-300">INSERT</span> su <span className="mono text-yellow-300">squadra_giocatori</span>.</div>
+                                    )}
+                                    {rosa.map((g, i) => (
+                                        <div key={g.id} className="p-3 flex items-center justify-between">
+                                            <div>
+                                                <div className="text-gray-100 font-medium">{g.nome_completo}</div>
+                                                <div className="text-gray-400 text-sm">{g.ruolo}</div>
+                                            </div>
+                                            <div className="text-amber-300 mono">€ {fmt(g.valore)}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="p-3 border-t border-gray-700 text-sm text-gray-300 flex items-center justify-between">
+                                    <div>Giocatori: <span className="mono">{countGiocatori}</span>/<span className="mono">{MAX_GIOCATORI}</span></div>
+                                    <div>Totale: <span className="mono">€ {fmt(totaleIngaggi)}</span> — Residuo: <span className="mono text-amber-300">€ {fmt(budgetResiduo)}</span></div>
+                                </div>
+                            </div>
+
+                            {/* Colonna destra: TERMINALE */}
+                            <div className="bg-gray-800 border-2 border-emerald-600 rounded-lg overflow-hidden">
+                                <div className="p-3 border-b border-gray-700">
+                                    <h3 className="text-cyan-400 font-semibold">Terminale DML</h3>
+                                    <p className="text-gray-400 text-sm mt-1">
+                                        Accetta solo <span className="mono text-yellow-300">INSERT</span>, <span className="mono text-yellow-300">DELETE</span>, <span className="mono text-yellow-300">UPDATE</span>.
+                                        Per <span className="mono">DELETE/UPDATE</span> è obbligatorio <span className="mono">WHERE</span>. Usa sempre il tuo <span className="mono">id_squadra = {team.id}</span>.
+                                    </p>
+                                </div>
+
+                                {/* Output */}
+                                <div ref={outRef} className="bg-black p-3 mono text-sm h-[420px] overflow-y-auto">
+                                    <div className="text-emerald-400 font-bold">╔═══════════════════════════════════════╗</div>
+                                    <div className="text-emerald-400 font-bold">║        CALCIO SQL — TERMINALE        ║</div>
+                                    <div className="text-emerald-400 font-bold">╚═══════════════════════════════════════╝</div>
+                                    <div className="text-gray-400">Scrivi <span className="text-gray-300">help</span> per i comandi.</div>
+                                    {consoleLines.map((l,idx)=>(
+                                        <div key={l.ts+'-'+idx} className={{
+                                            'info':'text-gray-300',
+                                            'hint':'text-gray-400 italic',
+                                            'warning':'text-orange-400',
+                                            'success':'text-green-400',
+                                            'error':'text-red-400',
+                                            'command':'text-yellow-300',
+                                            'table-row':'text-gray-200'
+                                        }[l.type] || 'text-gray-300'}>
+                                            {l.text}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Input */}
+                                <div className="p-3 border-t border-gray-700 flex items-center gap-2">
+                                    <span className="text-emerald-400 mono font-bold">SQL$</span>
+                                    <input
+                                        ref={inputRef}
+                                        className="flex-1 bg-transparent outline-none text-yellow-300 mono"
+                                        value={cmd}
+                                        onChange={e=>setCmd(e.target.value)}
+                                        onKeyDown={onKeyDown}
+                                        placeholder={`es. INSERT INTO squadra_giocatori (id_squadra, id_giocatore) VALUES (${team.id}, 7);`}
+                                        autoFocus
+                                    />
+                                    <button
+                                        onClick={onEnter}
+                                        className="bg-emerald-600 hover:bg-emerald-700 px-3 py-1 rounded font-semibold"
+                                    >Esegui</button>
+                                </div>
+
+                                {/* Esempi rapidi */}
+                                <div className="p-3 border-t border-gray-700 grid sm:grid-cols-2 gap-2">
+                                    <div className="text-gray-300 text-sm">
+                                        <div className="text-cyan-400 font-semibold">Esempi INSERT/DELETE</div>
+                                        <pre className="bg-gray-900 p-2 rounded mono overflow-x-auto text-xs">
+INSERT INTO squadra_giocatori (id_squadra, id_giocatore)
+VALUES ({team.id}, 5);
+
+DELETE FROM squadra_giocatori
+WHERE id_squadra = {team.id} AND id_giocatore = 5;
+                      </pre>
+                                    </div>
+                                    <div className="text-gray-300 text-sm">
+                                        <div className="text-cyan-400 font-semibold">Esempi PARTITE</div>
+                                        <pre className="bg-gray-900 p-2 rounded mono overflow-x-auto text-xs">
+-- Crea sfida (sei squadra 1)
+INSERT INTO partite (id_squadra_1, id_squadra_2, data)
+VALUES ({team.id}, 12, NOW());
+
+-- Imposta tattica
+UPDATE partite
+SET tattica_squadra_1 = '4-3-3'
+WHERE id_partita = 100 AND id_squadra_1 = {team.id};
+
+-- Dichiara pronta
+UPDATE partite
+SET squadra1_pronta = TRUE
+WHERE id_partita = 100 AND id_squadra_1 = {team.id};
+                                        </pre>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Colonna sinistra: PARTITE */}
+                            <div className="bg-gray-800 border-2 border-purple-600 rounded-lg overflow-hidden mt-4">
+                                <div className="p-3 border-b border-gray-700 flex items-center justify-between">
+                                    <h3 className="text-purple-400 font-semibold">⚔️ Partite</h3>
+                                    <button
+                                        onClick={() => fetchPartite(team.email_presidente)}
+                                        className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-sm"
+                                    >
+                                        Aggiorna
+                                    </button>
+                                </div>
+
+                                <div className="max-h-[400px] overflow-y-auto divide-y divide-gray-700">
+                                    {partite.length === 0 && (
+                                        <div className="p-4 text-gray-400 text-sm">
+                                            Nessuna partita in programma.
+                                            <br/>Usa <span className="mono text-yellow-300">INSERT INTO partite</span> per sfidare un avversario.
+                                        </div>
+                                    )}
+
+                                    {partite.map((p) => {
+                                        const isMyTeam1 = p.id_squadra_1 === team.id;
+                                        const myTeam = isMyTeam1 ? p.nome_squadra_1 : p.nome_squadra_2;
+                                        const opponent = isMyTeam1 ? p.nome_squadra_2 : p.nome_squadra_1;
+                                        const isLive = selectedMatch === p.id_partita && animatingTimeline;
+                                        const hideResult = isLive;
+                                        const risultato = (p.terminata && !hideResult)
+                                            ? `${p.gol_squadra_1} - ${p.gol_squadra_2}`
+                                            : '-';
+                                        const canStart = p.squadra1_pronta && p.squadra2_pronta && !p.terminata;
+
+                                        return (
+                                            <div key={p.id_partita} className="p-3 hover:bg-gray-750">
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <div className="flex-1">
+                                                        <div className="text-xs text-gray-500 mono">
+                                                            ID: {p.id_partita} • {formatDateTime(p.data)}
+                                                        </div>
+                                                        <div className="text-gray-100 font-medium mt-1 flex items-center gap-2">
+                                <span className={isMyTeam1 ? 'text-emerald-400' : ''}>
+                                    {p.nome_squadra_1}
+                                </span>
+                                                            {' vs '}
+                                                            <span className={!isMyTeam1 ? 'text-emerald-400' : ''}>
+                                    {p.nome_squadra_2}
+                                </span>
+                                                            {isLive && (
+                                                                <span className="inline-flex items-center gap-1 text-yellow-300 bg-yellow-900/40 border border-yellow-700 px-2 py-0.5 rounded text-xs animate-pulse">
+                                                                    ⚽ LIVE
+                                                                </span>
+                                                            )}
+                                                        </div>
+
+                                                        <div className="flex items-center gap-2 mt-1 text-xs">
+                                <span className={`px-2 py-0.5 rounded ${p.squadra1_pronta ? 'bg-green-900/50 text-green-300' : 'bg-gray-700 text-gray-400'}`}>
+                                    Sq. 1 pronta {p.squadra1_pronta ? '✓' : '⏳'}
+                                </span>
+                                                            <span className={`px-2 py-0.5 rounded ${p.squadra2_pronta ? 'bg-green-900/50 text-green-300' : 'bg-gray-700 text-gray-400'}`}>
+                                    Sq. 2 pronta {p.squadra2_pronta ? '✓' : '⏳'}
+                                </span>
+                                                        </div>
+
+                                                        {p.terminata && (
+                                                            <>
+                                                                <div className="mt-2 text-amber-300 font-bold text-lg">
+                                                                    {risultato}
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                        {!p.terminata && (
+                                                            <div className="mt-2 text-gray-400 text-sm">
+                                                                In attesa...
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="flex flex-col gap-1">
+                                                        {p.terminata ? (
+                                                            <button
+                                                                onClick={() => viewMatch(p.id_partita)}
+                                                                className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm font-semibold whitespace-nowrap"
+                                                            >
+                                                                📊 STATISTICHE
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => startMatch(p.id_partita)}
+                                                                disabled={!canStart || animatingTimeline}
+                                                                className="bg-green-600 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed px-3 py-1 rounded text-sm font-semibold whitespace-nowrap"
+                                                            >
+                                                                🏁 FISCHIO D'INIZIO
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Colonna destra: CRONACA/TIMELINE*/}
+                            {selectedMatch && matchTimeline.length > 0 && (
+                                <div className="bg-gray-800 border-2 border-cyan-600 rounded-lg overflow-hidden mt-4">
+                                    <div className="p-3 border-b border-gray-700">
+                                        <h3 className="text-cyan-400 font-semibold">📺 Cronaca Diretta - Partita #{selectedMatch}</h3>
+                                        {animatingTimeline && (
+                                            <div className="text-yellow-300 text-sm mt-1 flex items-center gap-2">
+                                                <span className="animate-pulse">⚽ LIVE</span>
+                                                <span className="text-gray-400">Azione {currentActionIndex + 1}</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="bg-black p-4 max-h-[500px] overflow-y-auto">
+                                        <div className="space-y-3">
+                                            {matchTimeline.slice(0, animatingTimeline ? currentActionIndex + 1 : matchTimeline.length).map((azione, idx) => {
+                                                const isLast = idx === currentActionIndex && animatingTimeline;
+                                                const isGoal = azione.tipo_azione.toLowerCase().includes('goal');
+
+                                                return (
+                                                    <div
+                                                        key={azione.id_tabellino || idx}
+                                                        className={`p-3 rounded border-l-4 ${
+                                                            isGoal
+                                                                ? 'bg-green-900/30 border-green-500'
+                                                                : 'bg-gray-900/50 border-cyan-500'
+                                                        } ${isLast ? 'animate-pulse' : ''}`}
+                                                    >
+                                                        <div className="flex items-start gap-3">
+                                                            <div className="text-cyan-400 font-bold mono text-lg min-w-[50px]">
+                                                                {azione.minuto_azione}'
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <div className={`font-semibold mb-1 ${
+                                                                    isGoal ? 'text-green-400' : 'text-amber-300'
+                                                                }`}>
+                                                                    {isGoal ? '⚽ ' : ''}{azione.tipo_azione}
+                                                                </div>
+                                                                <div className="text-gray-300 text-sm">
+                                                                    {azione.descrizione_azione}
+                                                                </div>
+                                                            </div>
+                                                            {isLast && animatingTimeline && (
+                                                                <div className="text-2xl animate-bounce">
+                                                                    ⚽
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+
+                                        {animatingTimeline && (
+                                            <div className="mt-4 text-center">
+                                                <div className="inline-block bg-yellow-900/30 text-yellow-300 px-4 py-2 rounded">
+                                                    <span className="animate-pulse">⏳ La partita procede...</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </section>
+                    )}
+                </main>
+
+                <footer className="max-w-7xl mx-auto p-4 text-center text-gray-500 text-sm">
+                    © Calcio SQL – Lezione DML
+                </footer>
+            </div>
+        );
+    }
+
+    ReactDOM.render(<App/>, document.getElementById('root'));
+</script>
+</body>
+</html>
