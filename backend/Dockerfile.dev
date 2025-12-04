@@ -1,0 +1,26 @@
+# ============================================
+# Calcio SQL Backend - Dockerfile (Development)
+# ============================================
+
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files from backend directory
+COPY backend/package*.json ./
+
+# Install ALL dependencies (including devDependencies for nodemon)
+RUN npm install
+
+# Copy application files from backend
+COPY backend/src ./src
+
+# Copy frontend from root
+COPY frontend ./frontend
+
+# Expose port
+EXPOSE 3000
+
+# Start application in development mode with nodemon
+CMD ["npm", "run", "dev"]

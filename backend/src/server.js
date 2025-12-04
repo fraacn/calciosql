@@ -19,7 +19,7 @@ app.use(cors({
 app.use(express.json());
 
 // Serve frontend statico
-app.use(express.static(path.join(__dirname, '../../frontend')));
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 // ==========================================
 // ROUTES - API Endpoints
@@ -329,7 +329,7 @@ app.post('/api/calcio/partita/start', async (req, res, next) => {
 // FALLBACK - Serve index.html per tutte le altre routes
 // ==========================================
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../frontend/index.html'));
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
 // ==========================================

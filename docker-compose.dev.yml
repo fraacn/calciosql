@@ -30,7 +30,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: ./backend/Dockerfile
+      dockerfile: ./backend/Dockerfile.dev
     container_name: calciosql-backend-dev
     restart: unless-stopped
     environment:
@@ -56,7 +56,6 @@ services:
       - ./frontend:/app/frontend
       # Escludi node_modules
       - /app/node_modules
-    command: npm run dev
 
   # pgAdmin (optional - for database management)
   pgadmin:
@@ -64,7 +63,7 @@ services:
     container_name: calciosql-pgadmin-dev
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@calciosql.local
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
