@@ -30,6 +30,8 @@ services:
       dockerfile: ./backend/Dockerfile
     container_name: calciosql-backend
     restart: unless-stopped
+    env_file:
+      - ./backend/.env
     environment:
       - DB_HOST=db
       - DB_PORT=5432
@@ -38,9 +40,6 @@ services:
       - DB_PASSWORD=calcio_pass
       - PORT=3000
       - NODE_ENV=production
-      # Optional: OpenAI API Key for match simulation
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
-      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4}
     ports:
       - "3000:3000"
     depends_on:
