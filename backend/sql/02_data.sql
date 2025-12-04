@@ -2,46 +2,301 @@
 -- CALCIO SQL - Dati iniziali
 -- ============================================
 
--- Inserimento giocatori di esempio
-INSERT INTO giocatori (nome_completo, ruolo, valore) VALUES
-    ('Cristiano Ronaldo', 'Attaccante', 25.00),
-    ('Lionel Messi', 'Attaccante', 30.00),
-    ('Kevin De Bruyne', 'Centrocampista', 20.00),
-    ('Virgil van Dijk', 'Difensore', 18.00),
-    ('Alisson Becker', 'Portiere', 15.00),
-    ('Robert Lewandowski', 'Attaccante', 22.00),
-    ('Luka Modrić', 'Centrocampista', 16.00),
-    ('Sergio Ramos', 'Difensore', 14.00),
-    ('Marc-André ter Stegen', 'Portiere', 12.00),
-    ('Kylian Mbappé', 'Attaccante', 35.00),
-    ('Erling Haaland', 'Attaccante', 28.00),
-    ('Jude Bellingham', 'Centrocampista', 19.00),
-    ('Antonio Rüdiger', 'Difensore', 13.00),
-    ('Manuel Neuer', 'Portiere', 11.00),
-    ('Karim Benzema', 'Attaccante', 21.00),
-    ('Toni Kroos', 'Centrocampista', 15.00),
-    ('Raphaël Varane', 'Difensore', 12.00),
-    ('Jan Oblak', 'Portiere', 10.00),
-    ('Neymar', 'Attaccante', 24.00),
-    ('Mohamed Salah', 'Attaccante', 23.00),
-    ('Frenkie de Jong', 'Centrocampista', 17.00),
-    ('Aymeric Laporte', 'Difensore', 11.00),
-    ('Ederson', 'Portiere', 9.00),
-    ('Phil Foden', 'Centrocampista', 18.00),
-    ('Rúben Dias', 'Difensore', 10.00),
-    ('Bruno Fernandes', 'Centrocampista', 19.00),
-    ('Harry Kane', 'Attaccante', 26.00),
-    ('Thibaut Courtois', 'Portiere', 13.00),
-    ('Federico Chiesa', 'Attaccante', 17.00),
-    ('Gianluigi Donnarumma', 'Portiere', 14.00),
-    ('Pedri', 'Centrocampista', 16.00),
-    ('Marquinhos', 'Difensore', 15.00),
-    ('João Cancelo', 'Difensore', 14.00),
-    ('Bernardo Silva', 'Centrocampista', 18.00),
-    ('Vinícius Júnior', 'Attaccante', 27.00),
-    ('Joshua Kimmich', 'Centrocampista', 17.00),
-    ('Rodri', 'Centrocampista', 16.00),
-    ('Heung-Min Son', 'Attaccante', 22.00),
-    ('Declan Rice', 'Centrocampista', 15.00),
-    ('Bukayo Saka', 'Attaccante', 20.00)
-ON CONFLICT DO NOTHING;
+-- Inserimento giocatori
+
+INSERT INTO public.giocatori VALUES (84, 'Bonifazi Kevin', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (33, 'Sommer Yann', 'Portiere', 15.00, false);
+INSERT INTO public.giocatori VALUES (78, 'Djimsiti Berat', 'Difensore', 8.00, false);
+INSERT INTO public.giocatori VALUES (56, 'Svilar Mile', 'Portiere', 18.00, false);
+INSERT INTO public.giocatori VALUES (76, 'Bellanova Raoul', 'Difensore', 14.00, false);
+INSERT INTO public.giocatori VALUES (2, 'Leonardo Bonucci', 'Difensore', 5.00, false);
+INSERT INTO public.giocatori VALUES (3, 'Marco Verratti', 'Centrocampista', 15.00, false);
+INSERT INTO public.giocatori VALUES (57, 'Vasquez Devis', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (81, 'Koussounou Odilon', 'Difensore', 4.00, false);
+INSERT INTO public.giocatori VALUES (21, 'Audero Emil', 'Portiere', 8.00, false);
+INSERT INTO public.giocatori VALUES (44, 'Terracciano Pietro', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (4, 'Ciro Immobile', 'Attaccante', 10.00, false);
+INSERT INTO public.giocatori VALUES (1, 'Gianluigi Donnarumma', 'Portiere', 20.00, false);
+INSERT INTO public.giocatori VALUES (5, 'Federico Chiesa', 'Attaccante', 12.00, false);
+INSERT INTO public.giocatori VALUES (13, 'Ravaglia Federico', 'Portiere', 2.00, false);
+INSERT INTO public.giocatori VALUES (11, 'Sportiello Marco', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (12, 'Pessina Massimo', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (91, 'Lucumi Jhon', 'Difensore', 8.00, false);
+INSERT INTO public.giocatori VALUES (79, 'Hien Isak', 'Difensore', 8.00, false);
+INSERT INTO public.giocatori VALUES (35, 'Perin Mattia', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (88, 'Holm Emil', 'Difensore', 6.00, false);
+INSERT INTO public.giocatori VALUES (25, 'De Gea David', 'Portiere', 15.00, false);
+INSERT INTO public.giocatori VALUES (50, 'Suzuki Zion', 'Portiere', 13.00, false);
+INSERT INTO public.giocatori VALUES (83, 'Zappacosta Davide', 'Difensore', 11.00, false);
+INSERT INTO public.giocatori VALUES (86, 'De Silvestri Lorenzo', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (7, 'Francesco Totti', 'Centrocampista', 90.00, false);
+INSERT INTO public.giocatori VALUES (90, 'Ivanisevic Jovan', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (95, 'Vitik Martin', 'Difensore', 7.00, false);
+INSERT INTO public.giocatori VALUES (10, 'Rossi Francesco', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (20, 'Vigorito Mauro', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (22, 'Nava Lapo', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (24, 'Silvestri Marco', 'Portiere', 3.00, false);
+INSERT INTO public.giocatori VALUES (26, 'Martinelli Tommaso', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (27, 'Leali Nicola', 'Portiere', 11.00, false);
+INSERT INTO public.giocatori VALUES (28, 'Siegrist Benjamin', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (29, 'Sommariva Daniele', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (30, 'Stolz Franz', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (36, 'Pinsoglio Carlo', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (37, 'Furlanetto Alessio', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (38, 'Mandas Chrīstos', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (39, 'Provedel Ivan', 'Portiere', 17.00, false);
+INSERT INTO public.giocatori VALUES (41, 'Fruchtl Christian', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (42, 'Samooja Jasper', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (45, 'Torriani Lorenzo', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (47, 'Meret Alex', 'Portiere', 13.00, false);
+INSERT INTO public.giocatori VALUES (48, 'Milinkovic Savic Vanja', 'Portiere', 6.00, false);
+INSERT INTO public.giocatori VALUES (49, 'Corvi Edoardo', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (51, 'Nicolas', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (52, 'Scuffet Simone', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (53, 'Semper Adrian', 'Portiere', 8.00, false);
+INSERT INTO public.giocatori VALUES (54, 'Vukovic Ante', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (58, 'Zelezny Radoslaw', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (59, 'Muric Arijanet', 'Portiere', 9.00, false);
+INSERT INTO public.giocatori VALUES (60, 'Satalino Giacomo', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (61, 'Turati Stefano', 'Portiere', 6.00, false);
+INSERT INTO public.giocatori VALUES (62, 'Zacchi Gioele', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (63, 'Israel Franco', 'Portiere', 11.00, false);
+INSERT INTO public.giocatori VALUES (64, 'Paleari Alberto', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (65, 'Plaia Francesco', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (66, 'Popa Mihai', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (67, 'Malusà Joel', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (68, 'Mosca Federico', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (69, 'Nunziante Alessandro', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (70, 'Okoye Maduka', 'Portiere', 3.00, false);
+INSERT INTO public.giocatori VALUES (71, 'Padelli Daniele', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (72, 'Sava Razvan', 'Portiere', 2.00, false);
+INSERT INTO public.giocatori VALUES (73, 'Montipò Lorenzo', 'Portiere', 11.00, false);
+INSERT INTO public.giocatori VALUES (74, 'Perilli Simone', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (85, 'Casale Nicolo', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (82, 'Scalvini Giorgio', 'Difensore', 6.00, false);
+INSERT INTO public.giocatori VALUES (55, 'Gollini Pierluigi', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (43, 'Maignan Mike', 'Portiere', 18.00, false);
+INSERT INTO public.giocatori VALUES (93, 'Markovic Petar', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (87, 'Heggem Torbjorn', 'Difensore', 8.00, false);
+INSERT INTO public.giocatori VALUES (15, 'Caprile Elia', 'Portiere', 12.00, false);
+INSERT INTO public.giocatori VALUES (77, 'Bernasconi Lorenzo', 'Difensore', 3.00, false);
+INSERT INTO public.giocatori VALUES (31, 'Di Gennaro Raffaele', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (18, 'Cavlina Nikola', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (8, 'Roberto Baggio', 'Attaccante', 90.00, false);
+INSERT INTO public.giocatori VALUES (16, 'Radunovic Boris', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (32, 'Martinez Josep', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (23, 'Saro Gianluca', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (19, 'Menke Henrique', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (75, 'Ahanor Honest', 'Difensore', 4.00, false);
+INSERT INTO public.giocatori VALUES (9, 'Carnesecchi Marco', 'Portiere', 17.00, false);
+INSERT INTO public.giocatori VALUES (34, 'Di Gregorio Michele', 'Portiere', 16.00, false);
+INSERT INTO public.giocatori VALUES (40, 'Falcone Wladimiro', 'Portiere', 12.00, false);
+INSERT INTO public.giocatori VALUES (17, 'Butez Jean', 'Portiere', 11.00, false);
+INSERT INTO public.giocatori VALUES (46, 'Contini Nikita', 'Portiere', 1.00, false);
+INSERT INTO public.giocatori VALUES (94, 'Miranda Juan', 'Difensore', 7.00, false);
+INSERT INTO public.giocatori VALUES (14, 'Skorupski Lukasz', 'Portiere', 11.00, false);
+INSERT INTO public.giocatori VALUES (80, 'Kolasinac Sead', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (89, 'Ilic Mihajlo', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (92, 'Lykogiannis Charalampos', 'Difensore', 2.00, false);
+INSERT INTO public.giocatori VALUES (98, 'Idrissi Riyad', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (99, 'Luperto Sebastiano', 'Difensore', 10.00, false);
+INSERT INTO public.giocatori VALUES (109, 'Goldaniga Edoardo', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (115, 'Smolcic Hrvoje', 'Difensore', 5.00, false);
+INSERT INTO public.giocatori VALUES (116, 'Valle Alex', 'Difensore', 8.00, false);
+INSERT INTO public.giocatori VALUES (124, 'Folino Francesco', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (126, 'Sernicola Leonardo', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (128, 'Dodo', 'Difensore', 14.00, false);
+INSERT INTO public.giocatori VALUES (139, 'Ferguson Lewis', 'Centrocampista', 9.00, false);
+INSERT INTO public.giocatori VALUES (150, 'Deiola Alessandro', 'Centrocampista', 7.00, false);
+INSERT INTO public.giocatori VALUES (157, 'Baturina Martin', 'Centrocampista', 12.00, false);
+INSERT INTO public.giocatori VALUES (158, 'Caqueret Maxence', 'Centrocampista', 12.00, false);
+INSERT INTO public.giocatori VALUES (162, 'Perrone Maximo', 'Centrocampista', 12.00, false);
+INSERT INTO public.giocatori VALUES (163, 'Bondo Warren', 'Centrocampista', 4.00, false);
+INSERT INTO public.giocatori VALUES (176, 'De Ketelaere Charles', 'Attaccante', 32.00, false);
+INSERT INTO public.giocatori VALUES (179, 'Scamacca Gianluca', 'Attaccante', 33.00, false);
+INSERT INTO public.giocatori VALUES (181, 'Cambiaghi Nicolo', 'Attaccante', 20.00, false);
+INSERT INTO public.giocatori VALUES (182, 'Castro Santiago', 'Attaccante', 28.00, false);
+INSERT INTO public.giocatori VALUES (183, 'Dallinga Thijs', 'Attaccante', 18.00, false);
+INSERT INTO public.giocatori VALUES (185, 'Immobile Ciro', 'Attaccante', 24.00, false);
+INSERT INTO public.giocatori VALUES (186, 'Belotti Andrea', 'Attaccante', 27.00, false);
+INSERT INTO public.giocatori VALUES (187, 'Borrelli Gennaro', 'Attaccante', 19.00, false);
+INSERT INTO public.giocatori VALUES (190, 'Luvumbo Zito', 'Attaccante', 16.00, false);
+INSERT INTO public.giocatori VALUES (192, 'Addai Jayden', 'Attaccante', 15.00, false);
+INSERT INTO public.giocatori VALUES (194, 'Diao Assane', 'Attaccante', 21.00, false);
+INSERT INTO public.giocatori VALUES (195, 'Douvikas Tasos', 'Attaccante', 24.00, false);
+INSERT INTO public.giocatori VALUES (196, 'Mezsargs Kristians', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (197, 'Morata Alvaro', 'Attaccante', 25.00, false);
+INSERT INTO public.giocatori VALUES (199, 'Bonazzoli Federico', 'Attaccante', 14.00, false);
+INSERT INTO public.giocatori VALUES (200, 'De Luca Manuel', 'Attaccante', 11.00, false);
+INSERT INTO public.giocatori VALUES (201, 'Faris Moumbagna', 'Attaccante', 11.00, false);
+INSERT INTO public.giocatori VALUES (203, 'Nasti Marco', 'Attaccante', 6.00, false);
+INSERT INTO public.giocatori VALUES (205, 'Sanabria Antonio', 'Attaccante', 16.00, false);
+INSERT INTO public.giocatori VALUES (208, 'Kean Moise', 'Attaccante', 49.00, false);
+INSERT INTO public.giocatori VALUES (211, 'Colombo Lorenzo', 'Attaccante', 23.00, false);
+INSERT INTO public.giocatori VALUES (107, 'Diego Carlos', 'Difensore', 9.00, false);
+INSERT INTO public.giocatori VALUES (202, 'Faye Nouroudine', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (121, 'Bianchetti Matteo', 'Difensore', 6.00, false);
+INSERT INTO public.giocatori VALUES (123, 'Floriano Mussolini', 'Difensore', 3.00, false);
+INSERT INTO public.giocatori VALUES (114, 'Sergi Roberto', 'Difensore', 4.00, false);
+INSERT INTO public.giocatori VALUES (122, 'Ceccherini Federico', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (136, 'Zalewski Nicola', 'Centrocampista', 6.00, false);
+INSERT INTO public.giocatori VALUES (133, 'Musah Milan', 'Centrocampista', 4.00, false);
+INSERT INTO public.giocatori VALUES (117, 'Van der Brempt Ignace', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (160, 'Kuhn Nicolas', 'Centrocampista', 15.00, false);
+INSERT INTO public.giocatori VALUES (132, 'Maldini Daniel', 'Centrocampista', 5.00, false);
+INSERT INTO public.giocatori VALUES (143, 'Odgaard Jens', 'Centrocampista', 20.00, false);
+INSERT INTO public.giocatori VALUES (209, 'Piccoli Roberto', 'Attaccante', 24.00, false);
+INSERT INTO public.giocatori VALUES (161, 'Paz Nico', 'Centrocampista', 35.00, false);
+INSERT INTO public.giocatori VALUES (207, 'Dzeko Edin', 'Attaccante', 21.00, false);
+INSERT INTO public.giocatori VALUES (172, 'Valoti Mattia', 'Centrocampista', 1.00, false);
+INSERT INTO public.giocatori VALUES (105, 'Ze Pedro', 'Difensore', 2.00, false);
+INSERT INTO public.giocatori VALUES (111, 'Moreno Alberto', 'Difensore', 2.00, false);
+INSERT INTO public.giocatori VALUES (188, 'Esposito Sebastiano', 'Attaccante', 20.00, false);
+INSERT INTO public.giocatori VALUES (213, 'Ekuban Caleb', 'Attaccante', 8.00, false);
+INSERT INTO public.giocatori VALUES (108, 'Dossena Alberto', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (131, 'Ederson da Silva', 'Centrocampista', 9.00, false);
+INSERT INTO public.giocatori VALUES (103, 'Rodriguez Juan', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (184, 'Dominguez Nicolas', 'Attaccante', 11.00, false);
+INSERT INTO public.giocatori VALUES (119, 'Barbieri Tommaso', 'Difensore', 3.00, false);
+INSERT INTO public.giocatori VALUES (166, 'Johnsen Dennis', 'Centrocampista', 5.00, false);
+INSERT INTO public.giocatori VALUES (142, 'Moro Nikola', 'Centrocampista', 4.00, false);
+INSERT INTO public.giocatori VALUES (212, 'Ekhator Jeff', 'Attaccante', 5.00, false);
+INSERT INTO public.giocatori VALUES (144, 'Orsolini Riccardo', 'Centrocampista', 40.00, false);
+INSERT INTO public.giocatori VALUES (134, 'Pasalic Mario', 'Centrocampista', 18.00, false);
+INSERT INTO public.giocatori VALUES (118, 'Vojvoda Mergim', 'Difensore', 6.00, false);
+INSERT INTO public.giocatori VALUES (145, 'Pobega Tommaso', 'Centrocampista', 5.00, false);
+INSERT INTO public.giocatori VALUES (204, 'Okereke David', 'Attaccante', 9.00, false);
+INSERT INTO public.giocatori VALUES (193, 'Azon Ivan', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (113, 'Ramon Jacobo', 'Difensore', 6.00, false);
+INSERT INTO public.giocatori VALUES (152, 'Folorunsho Michael', 'Centrocampista', 9.00, false);
+INSERT INTO public.giocatori VALUES (175, 'Zerbin Alessio', 'Centrocampista', 7.00, false);
+INSERT INTO public.giocatori VALUES (137, 'Bernardeschi Federico', 'Centrocampista', 9.00, false);
+INSERT INTO public.giocatori VALUES (102, 'Palestra Marco', 'Difensore', 7.00, false);
+INSERT INTO public.giocatori VALUES (130, 'De Roon Marten', 'Centrocampista', 9.00, false);
+INSERT INTO public.giocatori VALUES (171, 'Terracciano Filippo', 'Centrocampista', 5.00, false);
+INSERT INTO public.giocatori VALUES (153, 'Gaetano Gianluca', 'Centrocampista', 8.00, false);
+INSERT INTO public.giocatori VALUES (106, 'De Paula Lorenzo', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (159, 'Da Cunha Lucas', 'Centrocampista', 11.00, false);
+INSERT INTO public.giocatori VALUES (96, 'Zortea Nadir', 'Difensore', 13.00, false);
+INSERT INTO public.giocatori VALUES (154, 'Mazzitelli Luca', 'Centrocampista', 1.00, false);
+INSERT INTO public.giocatori VALUES (148, 'Velilles Aaron', 'Centrocampista', 1.00, false);
+INSERT INTO public.giocatori VALUES (189, 'Kılıcsoy Semih', 'Attaccante', 6.00, false);
+INSERT INTO public.giocatori VALUES (206, 'Vardy Jamie', 'Attaccante', 19.00, false);
+INSERT INTO public.giocatori VALUES (198, 'Rodriguez Jesus', 'Attaccante', 10.00, false);
+INSERT INTO public.giocatori VALUES (127, 'Comuzzo Pietro', 'Difensore', 5.00, false);
+INSERT INTO public.giocatori VALUES (155, 'Prati Matteo', 'Centrocampista', 6.00, false);
+INSERT INTO public.giocatori VALUES (177, 'Krstovic Nikola', 'Attaccante', 35.00, false);
+INSERT INTO public.giocatori VALUES (112, 'Posch Stefan', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (101, 'Obert Adam', 'Difensore', 6.00, false);
+INSERT INTO public.giocatori VALUES (170, 'Sarmiento Jeremy', 'Centrocampista', 9.00, false);
+INSERT INTO public.giocatori VALUES (149, 'Adopo Michel', 'Centrocampista', 7.00, false);
+INSERT INTO public.giocatori VALUES (169, 'Payero Martin', 'Centrocampista', 5.00, false);
+INSERT INTO public.giocatori VALUES (151, 'Felici Mattia', 'Centrocampista', 6.00, false);
+INSERT INTO public.giocatori VALUES (164, 'Collocolo Michele', 'Centrocampista', 6.00, false);
+INSERT INTO public.giocatori VALUES (140, 'Freuler Remo', 'Centrocampista', 9.00, false);
+INSERT INTO public.giocatori VALUES (156, 'Rog Marko', 'Centrocampista', 1.00, false);
+INSERT INTO public.giocatori VALUES (180, 'Sulemana Kamaldeen', 'Attaccante', 25.00, false);
+INSERT INTO public.giocatori VALUES (210, 'Carboni Valentin', 'Attaccante', 9.00, false);
+INSERT INTO public.giocatori VALUES (191, 'Pavoletti Leonardo', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (125, 'Pezzella Giuseppe', 'Difensore', 6.00, false);
+INSERT INTO public.giocatori VALUES (100, 'Mina Yerry', 'Difensore', 11.00, false);
+INSERT INTO public.giocatori VALUES (104, 'Zappa Gabriele', 'Difensore', 8.00, false);
+INSERT INTO public.giocatori VALUES (135, 'Samardzic Lazar', 'Centrocampista', 12.00, false);
+INSERT INTO public.giocatori VALUES (173, 'Vandeputte Jari', 'Centrocampista', 17.00, false);
+INSERT INTO public.giocatori VALUES (165, 'Grassi Alberto', 'Centrocampista', 5.00, false);
+INSERT INTO public.giocatori VALUES (110, 'Kempf Marc-Oliver', 'Difensore', 10.00, false);
+INSERT INTO public.giocatori VALUES (178, 'Lookman Ademola', 'Attaccante', 40.00, false);
+INSERT INTO public.giocatori VALUES (97, 'Di Pardo Alessandro', 'Difensore', 1.00, false);
+INSERT INTO public.giocatori VALUES (138, 'Fabbian Giovanni', 'Centrocampista', 5.00, false);
+INSERT INTO public.giocatori VALUES (168, 'Milanese Tommaso', 'Centrocampista', 1.00, false);
+INSERT INTO public.giocatori VALUES (216, 'Bonny', 'Attaccante', 27.00, false);
+INSERT INTO public.giocatori VALUES (217, 'Esposito Francesco Pio', 'Attaccante', 18.00, false);
+INSERT INTO public.giocatori VALUES (218, 'Martinez Lautaro', 'Attaccante', 61.00, false);
+INSERT INTO public.giocatori VALUES (219, 'Thuram Marcus', 'Attaccante', 45.00, false);
+INSERT INTO public.giocatori VALUES (223, 'Vlahovic Dusan', 'Attaccante', 39.00, false);
+INSERT INTO public.giocatori VALUES (225, 'Cancellieri Matteo', 'Attaccante', 14.00, false);
+INSERT INTO public.giocatori VALUES (226, 'Castellanos Jose Gimenez', 'Attaccante', 37.00, false);
+INSERT INTO public.giocatori VALUES (227, 'Dia Boulaye', 'Attaccante', 33.00, false);
+INSERT INTO public.giocatori VALUES (230, 'Burnete Rares', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (231, 'Camarda Francesco', 'Attaccante', 17.00, false);
+INSERT INTO public.giocatori VALUES (233, 'Konan Ndri', 'Attaccante', 4.00, false);
+INSERT INTO public.giocatori VALUES (234, 'Paco Esteban', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (235, 'Stulic Nikola', 'Attaccante', 28.00, false);
+INSERT INTO public.giocatori VALUES (236, 'Gimenez Santiago', 'Attaccante', 40.00, false);
+INSERT INTO public.giocatori VALUES (238, 'Nkunku Christopher', 'Attaccante', 42.00, false);
+INSERT INTO public.giocatori VALUES (239, 'Ambrosino Giuseppe', 'Attaccante', 2.00, false);
+INSERT INTO public.giocatori VALUES (240, 'Hojlund Rasmus', 'Attaccante', 48.00, false);
+INSERT INTO public.giocatori VALUES (241, 'Lang Noa', 'Attaccante', 14.00, false);
+INSERT INTO public.giocatori VALUES (242, 'Lucca Lorenzo', 'Attaccante', 26.00, false);
+INSERT INTO public.giocatori VALUES (243, 'Lukaku Romelu', 'Attaccante', 43.00, false);
+INSERT INTO public.giocatori VALUES (244, 'Popovic Matija', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (247, 'Djuric Milan', 'Attaccante', 8.00, false);
+INSERT INTO public.giocatori VALUES (248, 'Oristanio Gaetano Pio', 'Attaccante', 9.00, false);
+INSERT INTO public.giocatori VALUES (249, 'Pellegrino Matteo', 'Attaccante', 26.00, false);
+INSERT INTO public.giocatori VALUES (250, 'Buffon Louis Thomas', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (251, 'Dubickas Edgaras', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (252, 'Durmush Mert', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (253, 'Giani Elia', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (254, 'MBala Nzola', 'Attaccante', 23.00, false);
+INSERT INTO public.giocatori VALUES (255, 'Meister Henrik', 'Attaccante', 11.00, false);
+INSERT INTO public.giocatori VALUES (256, 'Moreo Stefano', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (257, 'Dovbyk Artem', 'Attaccante', 41.00, false);
+INSERT INTO public.giocatori VALUES (258, 'Dybala Paulo', 'Attaccante', 31.00, false);
+INSERT INTO public.giocatori VALUES (261, 'Soule Matias', 'Attaccante', 34.00, false);
+INSERT INTO public.giocatori VALUES (262, 'Alvarez Agustin Martinez', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (263, 'Berardi Domenico', 'Attaccante', 38.00, false);
+INSERT INTO public.giocatori VALUES (264, 'Cheddira Walid', 'Attaccante', 4.00, false);
+INSERT INTO public.giocatori VALUES (265, 'Laurienté Armand', 'Attaccante', 27.00, false);
+INSERT INTO public.giocatori VALUES (266, 'Moro Luca', 'Attaccante', 4.00, false);
+INSERT INTO public.giocatori VALUES (267, 'Pinamonti Andrea', 'Attaccante', 30.00, false);
+INSERT INTO public.giocatori VALUES (268, 'Skjellerup Laurs', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (269, 'Aboukhlal Zakaria', 'Attaccante', 13.00, false);
+INSERT INTO public.giocatori VALUES (270, 'Adams Che', 'Attaccante', 21.00, false);
+INSERT INTO public.giocatori VALUES (271, 'Franzoni Nicolo', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (272, 'Njie Alieu', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (274, 'Sow Asane', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (275, 'Zapata Duvan', 'Attaccante', 16.00, false);
+INSERT INTO public.giocatori VALUES (276, 'Zeppieri Michael', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (278, 'Bravo Iker', 'Attaccante', 12.00, false);
+INSERT INTO public.giocatori VALUES (279, 'Buska Adam', 'Attaccante', 24.00, false);
+INSERT INTO public.giocatori VALUES (280, 'Davis Keinan', 'Attaccante', 22.00, false);
+INSERT INTO public.giocatori VALUES (281, 'Gueye Idrissa', 'Attaccante', 6.00, false);
+INSERT INTO public.giocatori VALUES (282, 'Cisse Alphadjo', 'Attaccante', 4.00, false);
+INSERT INTO public.giocatori VALUES (283, 'Giovane Santana', 'Attaccante', 13.00, false);
+INSERT INTO public.giocatori VALUES (284, 'Mosquera Daniel', 'Attaccante', 14.00, false);
+INSERT INTO public.giocatori VALUES (285, 'Orban Gift', 'Attaccante', 23.00, false);
+INSERT INTO public.giocatori VALUES (286, 'Sarr Amin', 'Attaccante', 20.00, false);
+INSERT INTO public.giocatori VALUES (287, 'Kevin De Bruyne', 'Centrocampista', 23.00, false);
+INSERT INTO public.giocatori VALUES (291, 'Neymar', 'Attaccante', 10.00, false);
+INSERT INTO public.giocatori VALUES (237, 'Leao Rafael', 'Attaccante', 45.00, false);
+INSERT INTO public.giocatori VALUES (293, 'Camavinga', 'Centrocampista', 30.00, false);
+INSERT INTO public.giocatori VALUES (222, 'Openda Lois', 'Attaccante', 42.00, false);
+INSERT INTO public.giocatori VALUES (215, 'Vitinha', 'Attaccante', 18.00, false);
+INSERT INTO public.giocatori VALUES (120, 'Baschirotto Federico', 'Difensore', 11.00, false);
+INSERT INTO public.giocatori VALUES (129, 'Brescianini Marco', 'Centrocampista', 2.00, false);
+INSERT INTO public.giocatori VALUES (214, 'Venturino Lorenzo', 'Attaccante', 2.00, false);
+INSERT INTO public.giocatori VALUES (246, 'Cutrone Patrick', 'Attaccante', 21.00, false);
+INSERT INTO public.giocatori VALUES (273, 'Simeone Giovanni', 'Attaccante', 22.00, false);
+INSERT INTO public.giocatori VALUES (220, 'Jonathan David', 'Attaccante', 41.00, false);
+INSERT INTO public.giocatori VALUES (259, 'El Shaarawy Stephan', 'Attaccante', 3.00, false);
+INSERT INTO public.giocatori VALUES (224, 'Yıldız Kenan', 'Attaccante', 29.00, false);
+INSERT INTO public.giocatori VALUES (147, 'Sulemana Ibrahim', 'Centrocampista', 1.00, false);
+INSERT INTO public.giocatori VALUES (294, 'Haaland', 'Attaccante', 50.00, false);
+INSERT INTO public.giocatori VALUES (174, 'Vazquez Franco', 'Centrocampista', 13.00, false);
+INSERT INTO public.giocatori VALUES (260, 'Ferguson Joe', 'Attaccante', 26.00, false);
+INSERT INTO public.giocatori VALUES (229, 'Pedro', 'Attaccante', 19.00, false);
+INSERT INTO public.giocatori VALUES (232, 'Jovis Milos', 'Attaccante', 1.00, false);
+INSERT INTO public.giocatori VALUES (277, 'Bayo Vakoun Issouf', 'Attaccante', 5.00, false);
+INSERT INTO public.giocatori VALUES (288, 'Erling Haaland', 'Attaccante', 65.00, false);
+INSERT INTO public.giocatori VALUES (290, 'Paulo Roberto Cotechinho', 'Attaccante', 18.00, false);
+INSERT INTO public.giocatori VALUES (289, 'Fabinho', 'Centrocampista', 15.00, false);
+INSERT INTO public.giocatori VALUES (245, 'Benedyczak Adrian', 'Attaccante', 7.00, false);
+INSERT INTO public.giocatori VALUES (167, 'Lordkipanidze Dachi', 'Centrocampista', 2.00, false);
+INSERT INTO public.giocatori VALUES (141, 'Jaku Jordi', 'Centrocampista', 1.00, false);
+INSERT INTO public.giocatori VALUES (292, 'Bellingham Jude', 'Centrocampista', 30.00, false);
+INSERT INTO public.giocatori VALUES (228, 'Noslin Tijjani', 'Attaccante', 7.00, false);
+INSERT INTO public.giocatori VALUES (296, 'Lamine Yamal', 'Attaccante', 40.00, false);
+INSERT INTO public.giocatori VALUES (146, 'Rowe Jonathan', 'Centrocampista', 15.00, false);
+INSERT INTO public.giocatori VALUES (295, 'Mbappè', 'Attaccante', 50.00, false);
+INSERT INTO public.giocatori VALUES (221, 'Milik Arkadiusz', 'Attaccante', 1.00, false);
+
